@@ -1,6 +1,6 @@
-#include "game.h"
-#include "global.h"
-#include "utils/log.h"
+#include "pong/game.h"
+#include "pong/global.h"
+#include "pong/utils/log.h"
 
 int main(void) {
 

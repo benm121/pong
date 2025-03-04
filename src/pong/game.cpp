@@ -1,5 +1,6 @@
 #include "game.h"
 #include "paddle.h"
+#include "utils/collision.h"
 #include "utils/log.h"
 
 #include <glm/ext/matrix_clip_space.hpp>
