@@ -1,7 +1,7 @@
 #pragma once
 #include "global.h"
 #include "object.h"
-#include "utils/log.h"
+
 
 class Ball : public Object {
 public:
@@ -14,14 +14,14 @@ public:
         DEFAULT_SPEED
     ) {
         reset();
-        LOG_INFO("vel: (%.3f, %.3f)", velocity_.x, velocity_.y);
+        velocity_.y = -1.0f;
     }
 
     void update(float dt);
     void reset(void);
 
-    void flipVelX(bool randomize = true);
-    void flipVelY(bool randomize = true);
+    void horizCollision(bool randomizeVel = true);
+    void vertCollision(bool randomizeVel = true);
 
 public:
     float opacity_ = 0.0f;
@@ -42,6 +42,6 @@ private:
 
     float resetTime_ = DEFAULT_RESET_TIME;
     bool beingReset_ = true;
-
+    bool firstHitAfterReset_ = false; // makes ball only move horizontally until hit after being reset
 };
 

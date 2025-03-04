@@ -99,7 +99,7 @@ void Game::handleCollisions(void) {
 
         // prioritize horizontal over vertical
         if (isLeftCollision || isRightCollision) {
-            ball_->flipVelX();
+            ball_->horizCollision();
 
             if (isLeftCollision) { // fix clipping
                 ball_->position_.x = paddleLeft - halfBallWidth - 0.1f;
@@ -107,7 +107,7 @@ void Game::handleCollisions(void) {
                 ball_->position_.x = paddleRight + halfBallWidth + 0.1f;
             }
         } else if (isTopCollision || isBottomCollision) {
-            ball_->flipVelY();
+            ball_->vertCollision();
 
             if (isTopCollision) { // fix clipping
                 ball_->position_.y = paddleTop + halfBallHeight + 0.1f;

@@ -1,4 +1,5 @@
 #include "ball.h"
+#include "utils/log.h"
 #include "utils/random.h"
 
 #include <glm/geometric.hpp>
@@ -21,18 +22,23 @@ void Ball::reset(void) {
     beingReset_ = true;
     opacity_ = 0.0f;
     velocity_.x = rnd::flipCoin() ? -START_VELOCITY : START_VELOCITY;
+    firstHitAfterReset_ = false;
 }
 
-void Ball::flipVelX(bool randomize) {
-    if (randomize) {
+void Ball::horizCollision(bool randomizeVel) {
+    if (!firstHitAfterReset_) firstHitAfterReset_ = true;
+
+    if (randomizeVel) {
         velocity_.x *= -rnd::randFloat(0.9f, 1.2f);
     } else {
         velocity_.x *= -1.0f;
     }
 }
 
-void Ball::flipVelY(bool randomize) {
-    if (randomize) {
+void Ball::vertCollision(bool randomizeVel) {
+    if (!firstHitAfterReset_) firstHitAfterReset_ = true;
+
+    if (randomizeVel) {
         velocity_.y *= -rnd::randFloat(0.9f, 1.2f);
     } else {
         velocity_.y *= -1.0f;
@@ -52,12 +58,16 @@ void Ball::updateReset(float dt) {
 }
 
 void Ball::handleEdgeCollisions(void) {
-    const float halfHeight = size_.y * 0.5f;
-    position_.y = std::clamp(position_.y, halfHeight, global::SCREEN_HEIGHT - halfHeight);
+    const float halfSize = size_.y * 0.5f;
+    position_.y = std::clamp(position_.y, halfSize, global::SCREEN_HEIGHT - halfSize);
 
     if (position_.x < -OFFSCREEN_DISTANCE ||
         position_.x > global::SCREEN_WIDTH + OFFSCREEN_DISTANCE) {
         reset();
+    }
+
+    if (position_.y - halfSize <= 0.0f || position_.y + halfSize >= global::SCREEN_HEIGHT) {
+        vertCollision(false);
     }
 }
 
