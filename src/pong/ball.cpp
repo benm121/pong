@@ -1,5 +1,7 @@
 #include "ball.h"
+#include "utils/random.h"
 
+#include <glm/geometric.hpp>
 #include <algorithm>
 
 
@@ -9,14 +11,32 @@ void Ball::update(float dt) {
         return;
     }
 
-    position_.x += speed_ * dt;
+    position_ += velocity_ * speed_ * dt;
 
     handleEdgeCollisions();
+    clampVelocity();
 }
 
 void Ball::reset(void) {
     beingReset_ = true;
     opacity_ = 0.0f;
+    velocity_.x = rnd::flipCoin() ? -START_VELOCITY : START_VELOCITY;
+}
+
+void Ball::flipVelX(bool randomize) {
+    if (randomize) {
+        velocity_.x *= -rnd::randFloat(0.9f, 1.2f);
+    } else {
+        velocity_.x *= -1.0f;
+    }
+}
+
+void Ball::flipVelY(bool randomize) {
+    if (randomize) {
+        velocity_.y *= -rnd::randFloat(0.9f, 1.2f);
+    } else {
+        velocity_.y *= -1.0f;
+    }
 }
 
 // returns true when reset time is finished
@@ -39,5 +59,13 @@ void Ball::handleEdgeCollisions(void) {
         position_.x > global::SCREEN_WIDTH + OFFSCREEN_DISTANCE) {
         reset();
     }
+}
+
+void Ball::clampVelocity(void) {
+    velocity_ = glm::normalize(velocity_) * std::clamp(
+        glm::length(velocity_),
+        MIN_VELOCITY,
+        MAX_VELOCITY
+    );
 }
 

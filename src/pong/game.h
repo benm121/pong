@@ -28,6 +28,7 @@ public:
     void start(Mode mode);
 
 private:
+    void handleCollisions(void);
     void submitCenterLines(size_t lineCount, float lineWidth, float lineHeight, float opacity);
 
 private:

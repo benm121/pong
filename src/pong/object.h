@@ -21,6 +21,7 @@ struct Object {
         position_(pos),
         color_(color),
         size_(size),
+        velocity_(vel),
         speed_(speed)
     {}
 

@@ -55,6 +55,8 @@ void Game::start(Mode mode) {
         player2_->update(dt);
         ball_->update(dt);
 
+        handleCollisions();
+
         submitCenterLines(20, 3.0f, 15.0f, 0.5f);
 
         renderer_->submit(*player1_);
@@ -65,6 +67,58 @@ void Game::start(Mode mode) {
 
         window_->update();
     }
+}
+
+void Game::handleCollisions(void) {
+    auto handlePaddleCollision = [this](Paddle &paddle) {
+        if (!collision::AABB(paddle, *ball_)) return;
+
+        // half dimensions
+        float halfBallWidth = ball_->size_.x * 0.5f;
+        float halfBallHeight = ball_->size_.y * 0.5f;
+        float halfPaddleWidth = paddle.size_.x * 0.5f;
+        float halfPaddleHeight = paddle.size_.y * 0.5f;
+
+        // paddle edges
+        float paddleLeft = paddle.position_.x - halfPaddleWidth;
+        float paddleRight = paddle.position_.x + halfPaddleWidth;
+        float paddleTop = paddle.position_.y + halfPaddleHeight;
+        float paddleBottom = paddle.position_.y - halfPaddleHeight;
+
+        // ball edges
+        float ballLeft = ball_->position_.x - halfBallWidth;
+        float ballRight = ball_->position_.x + halfBallWidth;
+        float ballTop = ball_->position_.y + halfBallHeight;
+        float ballBottom = ball_->position_.y - halfBallHeight;
+
+        // collision side
+        bool isLeftCollision = ballRight > paddleLeft && ballLeft < paddleLeft;
+        bool isRightCollision = ballLeft < paddleRight && ballRight > paddleRight;
+        bool isTopCollision = ballBottom > paddleTop && ballTop < paddleTop;
+        bool isBottomCollision = ballTop < paddleBottom && ballBottom > paddleBottom;
+
+        // prioritize horizontal over vertical
+        if (isLeftCollision || isRightCollision) {
+            ball_->flipVelX();
+
+            if (isLeftCollision) { // fix clipping
+                ball_->position_.x = paddleLeft - halfBallWidth - 0.1f;
+            } else {
+                ball_->position_.x = paddleRight + halfBallWidth + 0.1f;
+            }
+        } else if (isTopCollision || isBottomCollision) {
+            ball_->flipVelY();
+
+            if (isTopCollision) { // fix clipping
+                ball_->position_.y = paddleTop + halfBallHeight + 0.1f;
+            } else {
+                ball_->position_.y = paddleBottom - halfBallHeight - 0.1f;
+            }
+        }
+    };
+
+    handlePaddleCollision(*player1_);
+    handlePaddleCollision(*player2_);
 }
 
 void Game::submitCenterLines(size_t lineCount, float lineWidth, float lineHeight, float opacity) {
