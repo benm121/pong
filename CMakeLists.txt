@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.2)
 
 project(project VERSION 1.0)
 
@@ -6,17 +6,65 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 find_package(OpenGL REQUIRED)
-find_package(glfw3 3.3 REQUIRED)
+
+include(FetchContent)
+
+FetchContent_Declare(
+    imgui
+    GIT_REPOSITORY https://github.com/ocornut/imgui.git
+    GIT_TAG        v1.91.8
+)
+
+FetchContent_Declare(
+    glfw
+    GIT_REPOSITORY https://github.com/glfw/glfw.git
+    GIT_TAG        3.4
+)
+
+FetchContent_MakeAvailable(imgui glfw)
+
+# find_package(OpenGL REQUIRED)
+# find_package(glfw3 3.3 REQUIRED)
+
+FetchContent_GetProperties(imgui)
+if (NOT imgui_POPULATED)
+    FetchContent_Populate(imgui)
+endif()
+
+FetchContent_GetProperties(glfw)
+if (NOT glfw_POPULATED)
+    FetchContent_Populate(glfw)
+endif()
+
+set(IMGUI_SOURCES
+    ${imgui_SOURCE_DIR}/imgui.cpp
+    ${imgui_SOURCE_DIR}/imgui_draw.cpp
+    ${imgui_SOURCE_DIR}/imgui_tables.cpp
+    ${imgui_SOURCE_DIR}/imgui_widgets.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_opengl3.cpp
+    ${imgui_SOURCE_DIR}/backends/imgui_impl_glfw.cpp
+)
+
+set(GLAD_SOURCES
+    src/libs/glad/glad.c
+)
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} ${GLAD_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     include
-    /usr/local/include/glad
-    /usr/include/GLFW
+    ${imgui_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}/backends
+    ${glfw_SOURCE_DIR}/include
+    src/libs/glad
 )
 
-target_link_libraries(${PROJECT_NAME} OpenGL::GL glad glfw dl pthread)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    OpenGL::GL
+    glfw
+    dl
+    pthread
+)
 

@@ -1,5 +1,6 @@
 #include "game.h"
 #include "paddle.h"
+#include "ui.h"
 #include "utils/collision.h"
 #include "utils/log.h"
 
@@ -56,7 +57,7 @@ void Game::start(Mode mode) {
         ball_->update(dt);
 
         handleCollisions();
-
+        checkScoreConditions(dt);
         submitCenterLines(20, 3.0f, 15.0f, 0.5f);
 
         renderer_->submit(*player1_);
@@ -64,6 +65,9 @@ void Game::start(Mode mode) {
         renderer_->submit(*ball_, ball_->opacity_);
 
         renderer_->flush();
+
+        ui::drawScore(scores_.first, 10, 10);
+        ui::drawScore(scores_.second, global::SCREEN_WIDTH - 110, 10);
 
         window_->update();
     }
@@ -115,6 +119,15 @@ void Game::handleCollisions(void) {
                 ball_->position_.y = paddleBottom - halfBallHeight - 0.1f;
             }
         }
+
+        // adjust y velocity based on point of contact with paddle
+        float paddleCenterY = paddle.position_.y;
+        float contactY = ball_->position_.y - paddleCenterY;
+        float normalizedContact = contactY / halfPaddleHeight;
+        float maxBounceAngle = glm::radians(90.0f);
+        float newVelY = std::sinf(maxBounceAngle * normalizedContact);
+
+        ball_->velocity_.y = newVelY;
     };
 
     handlePaddleCollision(*player1_);
@@ -132,6 +145,22 @@ void Game::submitCenterLines(size_t lineCount, float lineWidth, float lineHeight
             {255.0f, 255.0f, 255.0f},
             opacity
         );
+    }
+}
+
+void Game::checkScoreConditions(float dt) {
+    static float cooldown = 1.0f;
+    cooldown -= dt;
+    if (cooldown > 0.0f) return;
+
+    if (ball_->position_.x < 0.0f) {
+        ++scores_.second;
+        cooldown = 1.0f;
+        return;
+    } else if (ball_->position_.x > global::SCREEN_WIDTH) {
+        ++scores_.first;
+        cooldown = 1.0f;
+        return;
     }
 }
 

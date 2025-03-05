@@ -2,11 +2,15 @@
 #include "utils/log.h"
 
 #include <GLFW/glfw3.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
+
 #include <memory>
 
 
 // callback functions
-//
+
 static void errorCallback(int code, const char *description) {
     LOG_ERROR("(GLFW - %d): %s", code, description);
 }
@@ -20,6 +24,8 @@ Window::Window(const std::string& title, uint32_t w, uint32_t h)
 : title_(title), width_(w), height_(h) {}
 
 Window::~Window() {
+    cleanImGui();
+
     glfwDestroyWindow(window_);
     glfwTerminate();
 }
@@ -57,6 +63,7 @@ bool Window::init(void) {
     }
 
     glfwMakeContextCurrent(window_);
+    glfwSwapInterval(1);
 
     // init glad
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -71,19 +78,20 @@ bool Window::init(void) {
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(debugMessageCallback, nullptr);
 
-    glEnable(GL_DEPTH_TEST);
-
     glEnable(GL_BLEND); // enable transparency
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     lastFrameTime_ = glfwGetTime();
 
     glClearColor(0.05f, 0.05f, 0.05f, 1.0f);
+
+    initImGui();
+
     return true;
 }
 
 void Window::clear(void) const {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Window::update(void) {
@@ -96,5 +104,25 @@ float Window::getDeltaTime(void) const {
     float deltaTime = static_cast<float>(currentFrameTime - lastFrameTime_);
     lastFrameTime_ = currentFrameTime;
     return deltaTime;
+}
+
+void Window::initImGui(void) const {
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    ImGui::StyleColorsDark();
+
+    ImGui_ImplGlfw_InitForOpenGL(window_, true);
+    ImGui_ImplOpenGL3_Init("#version 460");
+
+    ImGui::GetIO().Fonts->AddFontFromFileTTF("assets/fonts/PressStart2P-Regular.ttf", 20);
+}
+
+void Window::cleanImGui(void) const {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 

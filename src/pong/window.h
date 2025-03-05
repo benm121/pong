@@ -31,6 +31,9 @@ public:
 private:
     bool init(void);
 
+    void initImGui(void) const;
+    void cleanImGui(void) const;
+
 private:
     std::string title_;
     uint32_t width_, height_;

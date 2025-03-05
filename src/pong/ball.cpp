@@ -13,6 +13,7 @@ void Ball::update(float dt) {
     }
 
     position_ += velocity_ * speed_ * dt;
+    /*LOG_INFO("vel: (%.3f, %.3f)", velocity_.x, velocity_.y);*/
 
     handleEdgeCollisions();
     clampVelocity();
@@ -22,12 +23,10 @@ void Ball::reset(void) {
     beingReset_ = true;
     opacity_ = 0.0f;
     velocity_.x = rnd::flipCoin() ? -START_VELOCITY : START_VELOCITY;
-    firstHitAfterReset_ = false;
+    velocity_.y = 0.0f;
 }
 
 void Ball::horizCollision(bool randomizeVel) {
-    if (!firstHitAfterReset_) firstHitAfterReset_ = true;
-
     if (randomizeVel) {
         velocity_.x *= -rnd::randFloat(0.9f, 1.2f);
     } else {
@@ -36,8 +35,6 @@ void Ball::horizCollision(bool randomizeVel) {
 }
 
 void Ball::vertCollision(bool randomizeVel) {
-    if (!firstHitAfterReset_) firstHitAfterReset_ = true;
-
     if (randomizeVel) {
         velocity_.y *= -rnd::randFloat(0.9f, 1.2f);
     } else {

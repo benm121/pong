@@ -6,15 +6,14 @@
 class Ball : public Object {
 public:
     Ball()
-    : Object(
-        CENTER_POS,
-        {0.0f, 255.0f, 150.0f},
-        {15.0f, 15.0f},
-        {0.0f, 0.0f},
-        DEFAULT_SPEED
-    ) {
+    : Object{
+        CENTER_POS,             // position
+        {255.0f, 255.0f, 255.0f}, // color
+        {15.0f, 15.0f},         // size
+        {0.0f, 0.0f},           // velocity
+        DEFAULT_SPEED           // speed
+    } {
         reset();
-        velocity_.y = -1.0f;
     }
 
     void update(float dt);
@@ -32,16 +31,15 @@ private:
     void clampVelocity(void);
 
 private:
-    static constexpr float MIN_VELOCITY = 0.5f;
-    static constexpr float MAX_VELOCITY = 3.0f;
+    static constexpr float MIN_VELOCITY = 1.0f;
+    static constexpr float MAX_VELOCITY = 5.0f;
     static constexpr float START_VELOCITY = 1.0f;
-    static constexpr float DEFAULT_SPEED = 250.0f;
+    static constexpr float DEFAULT_SPEED = 300.0f;
     static constexpr float DEFAULT_RESET_TIME = 1.0f;
     static constexpr float OFFSCREEN_DISTANCE = 100.0f; // how far the ball can go offscreen before being reset
     static constexpr glm::vec2 CENTER_POS = {global::SCREEN_WIDTH * 0.5f, global::SCREEN_HEIGHT * 0.5f};
 
     float resetTime_ = DEFAULT_RESET_TIME;
     bool beingReset_ = true;
-    bool firstHitAfterReset_ = false; // makes ball only move horizontally until hit after being reset
 };
 

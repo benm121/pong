@@ -30,6 +30,7 @@ public:
 private:
     void handleCollisions(void);
     void submitCenterLines(size_t lineCount, float lineWidth, float lineHeight, float opacity);
+    void checkScoreConditions(float dt);
 
 private:
     uint32_t screenWidth_, screenHeight_;
