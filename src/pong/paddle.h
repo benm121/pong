@@ -3,6 +3,7 @@
 #include "global.h"
 #include "input.h"
 #include "object.h"
+#include "utils/log.h"
 
 
 class Paddle : public Object {
@@ -14,10 +15,13 @@ public:
         {10.0f, 75.0f},
         {0.0f, 0.0f},
         DEFAULT_SPEED,
-    } {}
+    },
+    initialPos_(pos)
+    {}
     ~Paddle() = default;
 
     void update(float dt);
+    void resetPos(void) { position_ = initialPos_; }
 
 public:
     static constexpr float DEFAULT_SPEED = 600.0f;
@@ -27,6 +31,9 @@ public:
 
 private:
     void handleEdgeCollisions(void);
+
+protected:
+    glm::vec2 initialPos_;
 
 };
 
@@ -46,13 +53,13 @@ public:
         } else {
             position_.x = global::SCREEN_WIDTH - DISTANCE_FROM_EDGE;
         }
+        initialPos_.x = position_.x;
     }
 
     void input(const InputManager &inputManager);
 
 private:
     Num playerNum_;
-
 
 };
 

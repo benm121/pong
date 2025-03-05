@@ -41,14 +41,53 @@ bool Game::init(void) {
     return true;
 }
 
-void Game::start(Mode mode) {
-    if (mode != Mode::MULTIPLAYER) return; // TODO: add single player mode later
-
-    while (!window_->shouldClose() && !inputManager_->isKeyPressed(GLFW_KEY_ESCAPE)) {
+void Game::start(void) {
+    while (!window_->shouldClose()) {
         window_->clear();
 
-        float dt = window_->getDeltaTime();
+        switch (mode_) {
+        case Mode::MENU:
+            startMenu();
+            break;
+        case Mode::MULTIPLAYER:
+            startMultiplayer();
+            break;
+        case Mode::SINGLEPLAYER:
+            startSingleplayer();
+            break;
+        }
 
+        window_->update();
+    }
+}
+
+void Game::startMenu(void) {
+    // functions to call when game mode is selected
+    static auto spFunc = [this](void) { setModeSingleplayer(); };
+    static auto mpFunc = [this](void) { setModeMultiplayer(); };
+    static auto quitFunc = [this](void) { window_->setShouldClose(true); };
+
+    ui::drawMenu(spFunc, mpFunc, quitFunc);
+}
+
+void Game::startMultiplayer(void) {
+    static bool started = false;
+    static float startDelay = DEFAULT_START_DELAY;
+
+    if (inputManager_->isKeyPressed(GLFW_KEY_ESCAPE)) {
+        setModeMenu();
+        ball_->reset();
+        player1_->resetPos();
+        player2_->resetPos();
+        scores_ = {0, 0};
+        startDelay = DEFAULT_START_DELAY;
+        return;
+    }
+
+    float dt = window_->getDeltaTime();
+    startDelay -= dt;
+
+    if (startDelay <= 0.0f) {
         player1_->input(*inputManager_);
         player2_->input(*inputManager_);
 
@@ -59,17 +98,24 @@ void Game::start(Mode mode) {
         handleCollisions();
         checkScoreConditions(dt);
         submitCenterLines(20, 3.0f, 15.0f, 0.5f);
+    }
 
-        renderer_->submit(*player1_);
-        renderer_->submit(*player2_);
-        renderer_->submit(*ball_, ball_->opacity_);
+    renderer_->submit(*player1_);
+    renderer_->submit(*player2_);
+    renderer_->submit(*ball_, ball_->opacity_);
 
-        renderer_->flush();
+    renderer_->flush();
 
-        ui::drawScore(scores_.first, 10, 10);
-        ui::drawScore(scores_.second, global::SCREEN_WIDTH - 110, 10);
+    ui::drawScore(scores_.first, 10, 10);
+    ui::drawScore(scores_.second, global::SCREEN_WIDTH - 110, 10);
+}
 
-        window_->update();
+void Game::startSingleplayer(void) {
+    if (inputManager_->isKeyPressed(GLFW_KEY_ESCAPE)) {
+        setModeMenu();
+        ball_->reset();
+        scores_ = {0, 0};
+        return;
     }
 }
 

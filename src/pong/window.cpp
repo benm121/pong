@@ -118,6 +118,7 @@ void Window::initImGui(void) const {
     ImGui_ImplOpenGL3_Init("#version 460");
 
     ImGui::GetIO().Fonts->AddFontFromFileTTF("assets/fonts/PressStart2P-Regular.ttf", 20);
+
 }
 
 void Window::cleanImGui(void) const {
