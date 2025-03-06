@@ -74,9 +74,9 @@ bool Window::init(void) {
     }
 
     // additional settings
-    glEnable(GL_DEBUG_OUTPUT);
-    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-    glDebugMessageCallback(debugMessageCallback, nullptr);
+    /*glEnable(GL_DEBUG_OUTPUT);*/
+    /*glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);*/
+    /*glDebugMessageCallback(debugMessageCallback, nullptr);*/
 
     glEnable(GL_BLEND); // enable transparency
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
