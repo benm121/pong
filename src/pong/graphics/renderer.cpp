@@ -6,11 +6,11 @@
 #include <glm/ext/matrix_transform.hpp>
 
 void Renderer::submit(const glm::vec2 &pos, const glm::vec2 &size, const glm::vec3 &color, float opacity) {
-    renderQueue_.emplace(pos, size, color, opacity);
+    renderQueue_.push({pos, size, color, opacity}); // using emplace here creates issues on mac for some reason
 }
 
 void Renderer::submit(const Object &obj, float opacity) {
-    renderQueue_.emplace(obj.position_, obj.size_, obj.color_, opacity);
+    renderQueue_.push({obj.position_, obj.size_, obj.color_, opacity});
 };
 
 void Renderer::flush(void) {
