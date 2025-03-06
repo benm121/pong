@@ -115,7 +115,7 @@ void Window::initImGui(void) const {
     ImGui::StyleColorsDark();
 
     ImGui_ImplGlfw_InitForOpenGL(window_, true);
-    ImGui_ImplOpenGL3_Init("#version 460");
+    ImGui_ImplOpenGL3_Init("#version 330");
 
     ImGui::GetIO().Fonts->AddFontFromFileTTF("assets/fonts/PressStart2P-Regular.ttf", 20);
 
