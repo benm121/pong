@@ -9,3 +9,8 @@
 |Down Arrow      |Player 2 Down   |
 |ESC    |Exit to menu    |
 
+## Build and run:
+git clone https://github.com/benm121/pong.git
+cd pong && ./build.sh
+./build/pong
+

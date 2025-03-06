@@ -21,10 +21,13 @@ FetchContent_Declare(
     GIT_TAG        3.4
 )
 
-FetchContent_MakeAvailable(imgui glfw)
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+    GIT_TAG        1.0.1
+)
 
-# find_package(OpenGL REQUIRED)
-# find_package(glfw3 3.3 REQUIRED)
+FetchContent_MakeAvailable(imgui glfw glm)
 
 FetchContent_GetProperties(imgui)
 if (NOT imgui_POPULATED)
@@ -58,6 +61,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${imgui_SOURCE_DIR}
     ${imgui_SOURCE_DIR}/backends
     ${glfw_SOURCE_DIR}/include
+    ${glm_SOURCE_DIR}
     src/libs/glad
 )
 
