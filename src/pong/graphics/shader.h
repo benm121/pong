@@ -1,8 +1,8 @@
 #pragma once
 
-#include "glad/glad.h"
 #include "../utils/fileutils.h"
 
+#include <glad.h>
 #include <glm/ext/matrix_float4x4.hpp>
 #include <string_view>
 #include <unordered_map>

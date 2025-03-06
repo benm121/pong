@@ -1,9 +1,10 @@
 #pragma once
 
+#include <glad.h>
+
 #include <array>
 #include <cstddef>
 
-#include <glad/glad.h>
 
 class Quad {
 public:
