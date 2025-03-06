@@ -63,6 +63,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${glfw_SOURCE_DIR}/include
     ${glm_SOURCE_DIR}
     src/libs/glad
+    src/libs/KHR
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
