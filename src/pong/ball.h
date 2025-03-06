@@ -8,7 +8,7 @@ public:
     Ball()
     : Object{
         CENTER_POS,             // position
-        {255.0f, 255.0f, 255.0f}, // color
+        {1.0f, 1.0f, 1.0f},     // color
         {15.0f, 15.0f},         // size
         {0.0f, 0.0f},           // velocity
         DEFAULT_SPEED           // speed
@@ -32,7 +32,7 @@ private:
 
 private:
     static constexpr float MIN_VELOCITY = 1.0f;
-    static constexpr float MAX_VELOCITY = 5.0f;
+    static constexpr float MAX_VELOCITY = 3.0f; // starts to clip above 3
     static constexpr float START_VELOCITY = 1.0f;
     static constexpr float DEFAULT_SPEED = 300.0f;
     static constexpr float DEFAULT_RESET_TIME = 1.0f;

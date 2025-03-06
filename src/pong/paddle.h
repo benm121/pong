@@ -1,9 +1,9 @@
 #pragma once
 
+#include "ball.h"
 #include "global.h"
 #include "input.h"
 #include "object.h"
-#include "utils/log.h"
 
 
 class Paddle : public Object {
@@ -11,7 +11,7 @@ public:
     Paddle(const glm::vec2 &pos)
     : Object{
         pos,
-        {255.0f, 255.0f, 255.0f},
+        {1.0f, 1.0f, 1.0f},
         {10.0f, 75.0f},
         {0.0f, 0.0f},
         DEFAULT_SPEED,
@@ -60,6 +60,19 @@ public:
 
 private:
     Num playerNum_;
+
+};
+
+
+class AIPaddle : public Paddle {
+public:
+    AIPaddle()
+    : Paddle({global::SCREEN_WIDTH - DISTANCE_FROM_EDGE, global::SCREEN_HEIGHT * 0.5f})
+    {
+        color_ = {0.0f, 0.5f, 0.75f};
+    }
+    void trackBall(const Ball &ball);
+
 
 };
 

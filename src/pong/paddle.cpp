@@ -50,3 +50,20 @@ void PlayerPaddle::input(const InputManager &inputManager) {
 }
 
 
+// ===== AIPaddle =====
+
+
+void AIPaddle::trackBall(const Ball &ball) {
+    const float quarterHeight = size_.y * 0.25f;
+
+    if (ball.velocity_.x > 0.0f) {
+        if (ball.position_.x > global::SCREEN_WIDTH * 0.5f) {
+            moveState_.up = ball.position_.y > position_.y + quarterHeight;
+            moveState_.down = ball.position_.y < position_.y - quarterHeight;
+        }
+    } else {
+        moveState_.up = position_.y < global::SCREEN_HEIGHT * 0.5f - 100.0f;
+        moveState_.down = position_.y > global::SCREEN_HEIGHT * 0.5f + 100.0f;
+    }
+}
+

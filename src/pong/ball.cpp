@@ -1,5 +1,4 @@
 #include "ball.h"
-#include "utils/log.h"
 #include "utils/random.h"
 
 #include <glm/geometric.hpp>
@@ -13,7 +12,6 @@ void Ball::update(float dt) {
     }
 
     position_ += velocity_ * speed_ * dt;
-    /*LOG_INFO("vel: (%.3f, %.3f)", velocity_.x, velocity_.y);*/
 
     handleEdgeCollisions();
     clampVelocity();

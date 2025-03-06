@@ -35,6 +35,7 @@ bool Game::init(void) {
 
     player1_ = std::make_unique<PlayerPaddle>(PlayerPaddle::Num::ONE);
     player2_ = std::make_unique<PlayerPaddle>(PlayerPaddle::Num::TWO);
+    ai_ = std::make_unique<AIPaddle>();
 
     ball_ = std::make_unique<Ball>();
 
@@ -45,16 +46,10 @@ void Game::start(void) {
     while (!window_->shouldClose()) {
         window_->clear();
 
-        switch (mode_) {
-        case Mode::MENU:
+        if (mode_ == Mode::MENU) {
             startMenu();
-            break;
-        case Mode::MULTIPLAYER:
-            startMultiplayer();
-            break;
-        case Mode::SINGLEPLAYER:
-            startSingleplayer();
-            break;
+        } else {
+            startGame();
         }
 
         window_->update();
@@ -68,31 +63,38 @@ void Game::startMenu(void) {
     static auto quitFunc = [this](void) { window_->setShouldClose(true); };
 
     ui::drawMenu(spFunc, mpFunc, quitFunc);
+    startDelay_ = DEFAULT_START_DELAY;
 }
 
-void Game::startMultiplayer(void) {
-    static bool started = false;
-    static float startDelay = DEFAULT_START_DELAY;
-
+void Game::startGame(void) {
     if (inputManager_->isKeyPressed(GLFW_KEY_ESCAPE)) {
         setModeMenu();
         ball_->reset();
         player1_->resetPos();
         player2_->resetPos();
         scores_ = {0, 0};
-        startDelay = DEFAULT_START_DELAY;
+        startDelay_ = DEFAULT_START_DELAY;
         return;
     }
 
     float dt = window_->getDeltaTime();
-    startDelay -= dt;
+    bool multiplayer = mode_ == Mode::MULTIPLAYER;
+    startDelay_ -= 0.1f; // using dt creates issues when idling in the menu
 
-    if (startDelay <= 0.0f) {
+    if (startDelay_ <= 0.0f) {
         player1_->input(*inputManager_);
-        player2_->input(*inputManager_);
+        if (multiplayer) {
+            player2_->input(*inputManager_);
+        } else {
+            ai_->trackBall(*ball_);
+        }
 
         player1_->update(dt);
-        player2_->update(dt);
+        if (multiplayer) {
+            player2_->update(dt);
+        } else {
+            ai_->update(dt);
+        }
         ball_->update(dt);
 
         handleCollisions();
@@ -101,22 +103,17 @@ void Game::startMultiplayer(void) {
     }
 
     renderer_->submit(*player1_);
-    renderer_->submit(*player2_);
+    if (multiplayer) {
+        renderer_->submit(*player2_);
+    } else {
+        renderer_->submit(*ai_);
+    }
     renderer_->submit(*ball_, ball_->opacity_);
 
     renderer_->flush();
 
     ui::drawScore(scores_.first, 10, 10);
     ui::drawScore(scores_.second, global::SCREEN_WIDTH - 110, 10);
-}
-
-void Game::startSingleplayer(void) {
-    if (inputManager_->isKeyPressed(GLFW_KEY_ESCAPE)) {
-        setModeMenu();
-        ball_->reset();
-        scores_ = {0, 0};
-        return;
-    }
 }
 
 void Game::handleCollisions(void) {
@@ -147,7 +144,6 @@ void Game::handleCollisions(void) {
         bool isTopCollision = ballBottom > paddleTop && ballTop < paddleTop;
         bool isBottomCollision = ballTop < paddleBottom && ballBottom > paddleBottom;
 
-        // prioritize horizontal over vertical
         if (isLeftCollision || isRightCollision) {
             ball_->horizCollision();
 
@@ -177,7 +173,11 @@ void Game::handleCollisions(void) {
     };
 
     handlePaddleCollision(*player1_);
-    handlePaddleCollision(*player2_);
+    if (mode_ == Mode::MULTIPLAYER) {
+        handlePaddleCollision(*player2_);
+    } else {
+        handlePaddleCollision(*ai_);
+    }
 }
 
 void Game::submitCenterLines(size_t lineCount, float lineWidth, float lineHeight, float opacity) {

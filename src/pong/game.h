@@ -33,8 +33,7 @@ public:
 
 private:
     void startMenu(void);
-    void startMultiplayer(void);
-    void startSingleplayer(void);
+    void startGame(void);
 
     void handleCollisions(void);
     void submitCenterLines(size_t lineCount, float lineWidth, float lineHeight, float opacity);
@@ -49,6 +48,7 @@ private:
     std::pair<float, float> scores_ = {0.0f, 0.0f};
     uint32_t highScore_ = 0; // TODO: add ability to save and read high score
     Mode mode_ = Mode::MENU;
+    float startDelay_ = DEFAULT_START_DELAY;
 
     std::unique_ptr<Window> window_;
     std::unique_ptr<InputManager> inputManager_;
@@ -58,6 +58,7 @@ private:
 
     std::unique_ptr<PlayerPaddle> player1_;
     std::unique_ptr<PlayerPaddle> player2_;
+    std::unique_ptr<AIPaddle> ai_;
     std::unique_ptr<Ball> ball_;
 
 };
