@@ -1,7 +1,7 @@
 #include "renderer.h"
 #include "../utils/log.h"
 
-#include <glad/glad.h>
+#include <glad.h>
 
 #include <glm/ext/matrix_transform.hpp>
 
