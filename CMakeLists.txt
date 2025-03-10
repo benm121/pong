@@ -52,9 +52,13 @@ set(GLAD_SOURCES
     src/libs/glad/glad.c
 )
 
+set(MINIAUDIO_SOURCES
+    src/libs/miniaudio/miniaudio.c
+)
+
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} ${GLAD_SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI_SOURCES} ${GLAD_SOURCES} ${MINIAUDIO_SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     include
@@ -64,6 +68,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${glm_SOURCE_DIR}
     src/libs/glad
     src/libs/KHR
+    src/libs/miniaudio
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -71,5 +76,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     glfw
     dl
     pthread
+    m
 )
 

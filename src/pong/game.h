@@ -17,13 +17,19 @@ public:
         MULTIPLAYER,
         MENU
     };
+    // attributes that will change between games (first to 3)
+    struct Current {
+        std::pair<uint32_t, uint32_t> scores = {0, 0};
+        bool started = false;
+        bool ended = false;
+    };
 
     Game(const std::string &title, uint32_t width, uint32_t height)
         : title_(title),
         screenWidth_(width),
         screenHeight_(height)
     {}
-    ~Game() = default;
+    ~Game();
 
     bool init(void);
     void start(void);
@@ -41,20 +47,22 @@ private:
 
 private:
     static constexpr float DEFAULT_START_DELAY = 2.0f; // small delay before starting game mode
+    static constexpr uint32_t SCORE_TO_WIN = 3;
 
-    uint32_t screenWidth_, screenHeight_;
     std::string title_;
-
-    std::pair<float, float> scores_ = {0.0f, 0.0f};
+    uint32_t screenWidth_, screenHeight_;
+    uint32_t gamesWon_ = 0;
     uint32_t highScore_ = 0; // TODO: add ability to save and read high score
+
     Mode mode_ = Mode::MENU;
+    Current current_;
     float startDelay_ = DEFAULT_START_DELAY;
 
     std::unique_ptr<Window> window_;
     std::unique_ptr<InputManager> inputManager_;
 
     std::unique_ptr<Renderer> renderer_;
-    std::shared_ptr<Shader> shader_;
+    std::unique_ptr<Shader> shader_;
 
     std::unique_ptr<PlayerPaddle> player1_;
     std::unique_ptr<PlayerPaddle> player2_;

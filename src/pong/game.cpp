@@ -1,12 +1,20 @@
 #include "game.h"
+#include "audio.h"
+#include "global.h"
 #include "paddle.h"
 #include "ui.h"
 #include "utils/collision.h"
 #include "utils/log.h"
+#include "utils/random.h"
 
 #include <glm/ext/matrix_clip_space.hpp>
 
 #include <filesystem>
+
+
+Game::~Game() {
+    Audio::clean();
+}
 
 bool Game::init(void) {
 
@@ -16,15 +24,22 @@ bool Game::init(void) {
     }
     window_ = std::move(result.value());
 
+    if (!Audio::init()) {
+        LOG_ERROR_RETURN(false, "failed to initialize audio engine");
+    }
+    Audio::addSound("hit_1", "/assets/audio/hit_1.wav");
+    Audio::addSound("hit_2", "/assets/audio/hit_2.wav");
+    Audio::addSound("score", "/assets/audio/score.wav");
+
     inputManager_ = std::make_unique<InputManager>(window_->getGlfwWindow());
 
-    shader_ = std::make_shared<Shader>(
-        std::filesystem::absolute("assets/shaders/default_vert.glsl").c_str(),
-        std::filesystem::absolute("assets/shaders/default_frag.glsl").c_str()
+    shader_ = std::make_unique<Shader>(
+        (global::execPath / "assets/shaders/default_vert.glsl").c_str(),
+        (global::execPath / "assets/shaders/default_frag.glsl").c_str()
     );
 
     renderer_ = std::make_unique<Renderer>();
-    renderer_->setShader(shader_);
+    renderer_->setShader(shader_.get());
     renderer_->setProjection(
         glm::ortho(
             0.0f, static_cast<float>(window_->getWidth()),
@@ -43,6 +58,7 @@ bool Game::init(void) {
 }
 
 void Game::start(void) {
+
     while (!window_->shouldClose()) {
         window_->clear();
 
@@ -72,7 +88,8 @@ void Game::startGame(void) {
         ball_->reset();
         player1_->resetPos();
         player2_->resetPos();
-        scores_ = {0, 0};
+        ai_->resetPos();
+        current_.scores = {0, 0};
         startDelay_ = DEFAULT_START_DELAY;
         return;
     }
@@ -112,8 +129,8 @@ void Game::startGame(void) {
 
     renderer_->flush();
 
-    ui::drawScore(scores_.first, 10, 10);
-    ui::drawScore(scores_.second, global::SCREEN_WIDTH - 110, 10);
+    ui::drawScore(current_.scores.first, 10, 10);
+    ui::drawScore(current_.scores.second, global::SCREEN_WIDTH - 110, 10);
 }
 
 void Game::handleCollisions(void) {
@@ -146,6 +163,11 @@ void Game::handleCollisions(void) {
 
         if (isLeftCollision || isRightCollision) {
             ball_->horizCollision();
+            if (rnd::flipCoin()) {
+                Audio::play("hit_1");
+            } else {
+                Audio::play("hit_2");
+            }
 
             if (isLeftCollision) { // fix clipping
                 ball_->position_.x = paddleLeft - halfBallWidth - 0.1f;
@@ -162,7 +184,6 @@ void Game::handleCollisions(void) {
             }
         }
 
-        // adjust y velocity based on point of contact with paddle
         float paddleCenterY = paddle.position_.y;
         float contactY = ball_->position_.y - paddleCenterY;
         float normalizedContact = contactY / halfPaddleHeight;
@@ -200,13 +221,17 @@ void Game::checkScoreConditions(float dt) {
     if (cooldown > 0.0f) return;
 
     if (ball_->position_.x < 0.0f) {
-        ++scores_.second;
+        ++current_.scores.second;
         cooldown = 1.0f;
-        return;
+        Audio::play("score");
     } else if (ball_->position_.x > global::SCREEN_WIDTH) {
-        ++scores_.first;
+        ++current_.scores.first;
         cooldown = 1.0f;
-        return;
+        Audio::play("score");
+    }
+
+    if (current_.scores.first == SCORE_TO_WIN) {
+        // TODO: this
     }
 }
 

@@ -32,9 +32,9 @@ private:
 
 private:
     static constexpr float MIN_VELOCITY = 1.0f;
-    static constexpr float MAX_VELOCITY = 3.0f; // starts to clip above 3
+    static constexpr float MAX_VELOCITY = 1.6f;
     static constexpr float START_VELOCITY = 1.0f;
-    static constexpr float DEFAULT_SPEED = 300.0f;
+    static constexpr float DEFAULT_SPEED = 600.0f;
     static constexpr float DEFAULT_RESET_TIME = 1.0f;
     static constexpr float OFFSCREEN_DISTANCE = 100.0f; // how far the ball can go offscreen before being reset
     static constexpr glm::vec2 CENTER_POS = {global::SCREEN_WIDTH * 0.5f, global::SCREEN_HEIGHT * 0.5f};

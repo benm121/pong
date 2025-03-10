@@ -27,7 +27,7 @@ public:
     void submit(const Object &obj, float opacity = 1.0f);
     void flush(void);
 
-    void setShader(std::shared_ptr<Shader> shader) { shader_ = shader; }
+    void setShader(Shader *shader) { shader_ = shader; }
     void setProjection(const glm::mat4 &proj) { proj_ = proj; }
 
 private:
@@ -35,7 +35,7 @@ private:
 
 private:
     std::queue<RenderData> renderQueue_;
-    std::shared_ptr<Shader> shader_;
+    Shader *shader_;
     glm::mat4 proj_{1.0f};
 
     const Quad quad_;

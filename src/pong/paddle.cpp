@@ -1,7 +1,8 @@
 #include "paddle.h"
 #include "global.h"
 
-#include <algorithm>
+#include <glm/common.hpp>
+#include <cmath>
 
 
 // ===== Paddle =====
@@ -54,16 +55,19 @@ void PlayerPaddle::input(const InputManager &inputManager) {
 
 
 void AIPaddle::trackBall(const Ball &ball) {
-    const float quarterHeight = size_.y * 0.25f;
+    const float deltaX = position_.x - ball.position_.x;
+    const float time = deltaX / ball.velocity_.x;
+    const float futureYPos = ball.position_.y + ball.velocity_.y * time;
+    const float hitZone = size_.y * 0.25f;
 
     if (ball.velocity_.x > 0.0f) {
-        if (ball.position_.x > global::SCREEN_WIDTH * 0.5f) {
-            moveState_.up = ball.position_.y > position_.y + quarterHeight;
-            moveState_.down = ball.position_.y < position_.y - quarterHeight;
+        if (ball.position_.x > global::SCREEN_WIDTH * 0.25f) {
+            moveState_.up = futureYPos > position_.y + hitZone;
+            moveState_.down = futureYPos < position_.y - hitZone;
         }
     } else {
-        moveState_.up = position_.y < global::SCREEN_HEIGHT * 0.5f - 100.0f;
-        moveState_.down = position_.y > global::SCREEN_HEIGHT * 0.5f + 100.0f;
+        moveState_.up = position_.y < (global::SCREEN_HEIGHT * 0.5f) - 100.0f;
+        moveState_.down = position_.y > (global::SCREEN_HEIGHT * 0.5f) + 100.0f;
     }
 }
 

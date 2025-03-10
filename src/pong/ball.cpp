@@ -1,4 +1,6 @@
 #include "ball.h"
+#include "audio.h"
+#include "utils/log.h"
 #include "utils/random.h"
 
 #include <glm/geometric.hpp>
